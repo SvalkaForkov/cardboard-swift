@@ -30,7 +30,11 @@ class Matrix3x3d
     func zero()
     {
         //for (i in 0 ..< 9)
+<<<<<<< HEAD
         for i in 0...8
+=======
+        for i in 0...9
+>>>>>>> 075d48f056872e9cb768e54630280c49278b4a52
         {
             m[i] = 0.0
         }

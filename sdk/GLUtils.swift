@@ -7,8 +7,15 @@ func clamp<T: Comparable>(_ value: T, lower: T, upper: T) -> T
     return min(max(value, lower), upper)
 }
 
+<<<<<<< HEAD
 func BUFFER_OFFSET(_ i: Int) -> UnsafeRawPointer? {
     return UnsafeRawPointer(bitPattern: i)
+=======
+func BUFFER_OFFSET(_ i: Int) -> UnsafeRawPointer
+{
+    let p: UnsafeRawPointer? = nil
+    return (p?.advanced(by: i))!
+>>>>>>> 075d48f056872e9cb768e54630280c49278b4a52
 }
 
 func GLLinkProgram(_ prog: GLuint) -> Bool
