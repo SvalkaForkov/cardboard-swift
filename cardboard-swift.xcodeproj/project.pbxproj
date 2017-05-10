@@ -177,6 +177,7 @@
 				TargetAttributes = {
 					B89A011C1C5FBA4D00B7D90F = {
 						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = 9GV85F487X;
 						LastSwiftMigration = 0830;
 					};
 				};
@@ -350,9 +351,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 9GV85F487X;
 				INFOPLIST_FILE = "cardboard-swift/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "nzff.cardboard-swift";
+				PRODUCT_BUNDLE_IDENTIFIER = com.digid.;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
@@ -362,9 +364,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 9GV85F487X;
 				INFOPLIST_FILE = "cardboard-swift/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "nzff.cardboard-swift";
+				PRODUCT_BUNDLE_IDENTIFIER = com.digid.;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
