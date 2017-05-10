@@ -4,14 +4,14 @@ import OpenGLES
 
 let UNIFORM_MODELVIEWPROJECTION_MATRIX = 0
 let UNIFORM_NORMAL_MATRIX = 1
-var uniforms = [GLint](count: 2, repeatedValue: 0)
+var uniforms = [GLint](repeating: 0, count: 2)
 
 class GameViewController: CSViewController, CSStereoRendererDelegate
 {
     var program: GLuint = 0
     
     var headViewMatrix:GLKMatrix4 = GLKMatrix4Identity
-    var modelViewProjectionMatrix:GLKMatrix4 = GLKMatrix4Identity
+    var modelViewProjectionMatrix = GLKMatrix4Identity
     var normalMatrix: GLKMatrix3 = GLKMatrix3Identity
     
     var rotation: Float = 0.0
@@ -29,9 +29,9 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
         super.viewDidLoad()
     }
     
-    func setupRendererWithView(view:GLKView)
+    func setupRendererWithView(_ view:GLKView)
     {
-        EAGLContext.setCurrentContext(view.context)
+        EAGLContext.setCurrent(view.context)
         
         self.loadShaders()
         
@@ -45,7 +45,7 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
         
         glGenBuffers(1, &vertexBuffer)
         glBindBuffer(GLenum(GL_ARRAY_BUFFER), vertexBuffer)
-        glBufferData(GLenum(GL_ARRAY_BUFFER), GLsizeiptr(sizeof(GLfloat) * gCubeVertexData.count), &gCubeVertexData, GLenum(GL_STATIC_DRAW))
+        glBufferData(GLenum(GL_ARRAY_BUFFER), GLsizeiptr(MemoryLayout<GLfloat>.size * gCubeVertexData.count), &gCubeVertexData, GLenum(GL_STATIC_DRAW))
         
         glEnableVertexAttribArray(GLuint(cubePositionLocation))
         glVertexAttribPointer(GLuint(cubePositionLocation), 3, GLenum(GL_FLOAT), GLboolean(GL_FALSE), 24, BUFFER_OFFSET(0))
@@ -56,14 +56,14 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
         glBindVertexArrayOES(0)
     }
     
-    func prepareNewFrameWithHeadViewMatrix(headViewMatrix:GLKMatrix4)
+    func prepareNewFrameWithHeadViewMatrix(_ headViewMatrix:GLKMatrix4)
     {
         self.headViewMatrix = headViewMatrix
         
         rotation += Float(self.timeSinceLastUpdate * 0.5)
     }
     
-    func drawEyeWithEye(eye:EyeMatrix)
+    func drawEyeWithEye(_ eye:EyeMatrix)
     {
         glClearColor(0.5, 0.5, 0.5, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
@@ -89,12 +89,16 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
         glUseProgram(program)
         glBindVertexArrayOES(vertexArray)
         
-        withUnsafePointer(&modelViewProjectionMatrix, {
-            glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, UnsafePointer($0))
+        
+        withUnsafePointer(to: &modelViewProjectionMatrix, {
+            let ptr: UnsafePointer<GLfloat> = UnsafeRawPointer($0).assumingMemoryBound(to: GLfloat.self)
+
+            glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, ptr)
         })
         
-        withUnsafePointer(&normalMatrix, {
-            glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, UnsafePointer($0))
+        withUnsafePointer(to: &normalMatrix, {
+            let ptr: UnsafePointer<GLfloat> = UnsafeRawPointer($0).assumingMemoryBound(to: GLfloat.self)
+            glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, ptr)
         })
         
         glDrawArrays(GLenum(GL_TRIANGLES), 0, 36)
@@ -103,17 +107,17 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
         glUseProgram(0)
     }
     
-    func shutdownRendererWithView(view:GLKView)
+    func shutdownRendererWithView(_ view:GLKView)
     {
         // todo: Should handle this...
     }
     
-    func rendererDidChangeSize(size:CGSize)
+    func rendererDidChangeSize(_ size:CGSize)
     {
         // todo: Should handle this...
     }
     
-    func finishFrameWithViewportRect(viewport:CGRect)
+    func finishFrameWithViewportRect(_ viewport:CGRect)
     {
         // todo: Should handle this...
     }
@@ -127,14 +131,14 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
         
         program = glCreateProgram()
         
-        vertShaderPathname = NSBundle.mainBundle().pathForResource("Shader", ofType: "vsh")!
+        vertShaderPathname = Bundle.main.path(forResource: "Shader", ofType: "vsh")!
         if GLCompileShaderFromFile(&vertShader, type: GLenum(GL_VERTEX_SHADER), file: vertShaderPathname) == false
         {
             print("Failed to compile vertex shader")
             return false
         }
         
-        fragShaderPathname = NSBundle.mainBundle().pathForResource("Shader", ofType: "fsh")!
+        fragShaderPathname = Bundle.main.path(forResource: "Shader", ofType: "fsh")!
         if !GLCompileShaderFromFile(&fragShader, type: GLenum(GL_FRAGMENT_SHADER), file: fragShaderPathname)
         {
             print("Failed to compile fragment shader")
@@ -145,8 +149,8 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
         
         glAttachShader(program, fragShader)
         
-        glBindAttribLocation(program, GLuint(GLKVertexAttrib.Position.rawValue), "position")
-        glBindAttribLocation(program, GLuint(GLKVertexAttrib.Normal.rawValue), "normal")
+        glBindAttribLocation(program, GLuint(GLKVertexAttrib.position.rawValue), "position")
+        glBindAttribLocation(program, GLuint(GLKVertexAttrib.normal.rawValue), "normal")
         
         if !GLLinkProgram(program)
         {
@@ -181,15 +185,15 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
     {
         super.didReceiveMemoryWarning()
         
-        if self.isViewLoaded() && (self.view.window != nil)
+        if self.isViewLoaded && (self.view.window != nil)
         {
             self.view = nil
             
             self.tearDownGL()
             
-            if EAGLContext.currentContext() === self.glContext
+            if EAGLContext.current() === self.glContext
             {
-                EAGLContext.setCurrentContext(nil)
+                EAGLContext.setCurrent(nil)
             }
             
             self.glContext = nil
@@ -200,15 +204,15 @@ class GameViewController: CSViewController, CSStereoRendererDelegate
     {
         self.tearDownGL()
         
-        if EAGLContext.currentContext() === self.glContext
+        if EAGLContext.current() === self.glContext
         {
-            EAGLContext.setCurrentContext(nil)
+            EAGLContext.setCurrent(nil)
         }
     }
     
     func tearDownGL()
     {
-        EAGLContext.setCurrentContext(self.glContext)
+        EAGLContext.setCurrent(self.glContext)
         
         glDeleteBuffers(1, &vertexBuffer)
         glDeleteVertexArraysOES(1, &vertexArray)
